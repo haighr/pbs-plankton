@@ -1,0 +1,17 @@
+Package: PBSplankton
+Version: 0.1.0
+Date:    2016-04-25
+Title:   Plankton -- From Samples to Satellites
+Authors@R: c(
+   person("Rowan", "Haigh", role = c("aut", "cre"), email = "rowan.haigh@dfo-mpo.gc.ca"),
+   person("Lyse", "Godbout", role = "ctb", email = "lyse.godbout@dfo-mpo.gc.ca"))
+Author:     Rowan Haigh [aut, cre], Lyse Godbout [ctb]
+Maintainer: Rowan Haigh <rowan.haigh@dfo-mpo.gc.ca>
+Copyright:  2016, Fisheries and Oceans Canada
+Depends:    R (>= 3.0.0), PBStools
+Description: Provides tools for exploring and processing plankton
+   data from samples to satellites.
+License: GPL (>= 2)
+URL: https://github.com/pbs-software/pbs-plankton,
+     https://github.com/pbs-software/pbs-tools
+

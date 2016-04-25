@@ -1,0 +1,10 @@
+PBSplankton Changes
+==============================
+Authors: RH  = Rowan Haigh
+         LG  = Lyse Godbout
+------------------------------
+
+0.1.0 (2016-04-25)
+  • Started User's Guide for PBSplankton. (RH 160425)
+  • Extracted dataset `phytospp' from `PBSdata'. (RH 160425)
+  • Created new package `PBSplankton' using three functions from `PBStools' -- `boxSeason', `plotDiversity', `trackComp'. (RH 160425)

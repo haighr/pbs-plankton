@@ -1,0 +1,370 @@
+\documentclass[letterpaper,11pt,fleqn]{article}
+%\VignetteIndexEntry{Introduction to PBSplankton}
+%\VignettePackage{PBSplankton}
+
+% Packages
+%\usepackage{Sweave}
+\usepackage{graphicx}
+\usepackage{verbatim,fancyvrb}
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry} %  page margins
+\usepackage[font=small,format=plain,labelfont=bf,indention=0.25in,labelsep=period,justification=raggedright]{caption}
+\usepackage{parskip}
+\renewcommand{\rmdefault}{phv}% Helvetica
+\renewcommand{\sfdefault}{phv}% Helvetica
+
+
+% http://tex.stackexchange.com/questions/49788/hyperref-url-long-url-with-dashes-wont-break?rq=1
+\usepackage[hyphens]{url}
+\def\UrlFont{\small\tt}
+
+\usepackage[round]{natbib}
+\usepackage{lscape}
+\usepackage[utf8]{inputenc}
+\usepackage{mathtools}
+\usepackage[multiple]{footmisc}
+\usepackage{longtable,array} % need array when specifying a ragged right column:  >{\raggedright\arraybackslash}{p2in}
+\usepackage{xifthen}         % provides \ifthenelse and \isempty
+%\usepackage{amsmath}
+  \setlength{\mathindent}{0.5in}
+
+\usepackage{hyperref}
+% from Sweave.Rnw in C:\Apps\R\R300\library\utils\doc
+\hypersetup{%
+colorlinks,%
+plainpages=true,%
+linkcolor=black,%
+citecolor=black,%
+urlcolor=blue,%
+%pdfstartview=FitH,% or Fit
+pdfstartview=Fit, %{XYZ null null 1},%
+pdfview={XYZ null null null},%
+pdfpagemode=UseOutlines,% for bookmarks
+pdfauthor={Rowan Haigh and Jon T. Schnute},%
+pdftitle={PBSplankton User's Guide},%
+pdfsubject={Software for semi-serious scientists}%
+}
+
+\raggedright
+%\setlength{\hangindent}{0.25in}
+\def\noi{\noindent}
+\def\noh{\noindent \hangindent=\parindent}
+\def\tab{\hspace{0.5 in}}
+\newcommand\tstrut{\rule{0pt}{2.4ex}}         % top strut for table row
+\newcommand\bstrut{\rule[-1.0ex]{0pt}{0pt}}   % bottom strut for table row
+
+% For colors
+\usepackage{color}
+\definecolor{red}{rgb}{0.8039216,0.2156863,0}
+\definecolor{green}{rgb}{0, 1, 0}
+\definecolor{blue}{rgb}{0, 0, 1}
+\definecolor{slategrey}{rgb}{0.4392157, 0.5019608, 0.5647059}
+\definecolor{deepskyblue}{rgb}{0, 0.7490196, 1}
+\definecolor{gainsboro}{rgb}{0.8627451,0.8627451,0.8627451}
+\definecolor{aliceblue}{RGB}{240, 248, 255}
+\definecolor{dodgerblue}{RGB}{24, 116, 205}
+\definecolor{moccasin}{RGB}{255, 236, 204}
+\definecolor{honeydew}{RGB}{240, 255, 240}
+
+% Definitions
+%\newfont{inc}{inconsolata} 
+\newcommand{\slan}{{\tt S}}
+\newcommand{\rlan}{{\tt R}}
+\newcommand{\pbsd}{{\tt PBSdata}}
+\newcommand{\pbsf}{{\tt PBSfishery}}
+\newcommand{\pbst}{{\tt PBSplankton}}
+\newcommand{\pbsdat}{{\it PBS Data}}
+\newcommand{\tcl}{{\tt Tcl/Tk}}
+
+% from RODBC.Rnw
+\newcommand{\code}[1]{\normalsize\texttt{#1}\normalsize}
+\newcommand{\pkg}[1]{{\bf #1}}
+\newcommand{\var}[1]{\emph{#1}}
+\newcommand{\link}[1]{#1}
+\newcommand{\sQuote}[1]{`#1'}
+\newcommand{\dQuote}[1]{``#1''}
+\newcommand{\eqn}[1]{\begin{equation}#1\end{equation}}
+%\newcommand{\eqn}[1]{\hspace{0.5in}$#1$}
+\newcommand{\gfrac}[2]{\genfrac{}{}{}{0}{#1}{#2}}
+%\newcommand{\URL}[1]{\small\url{#1}\normalsize}
+
+\newcommand{\gui}[1]{\small\textmd{\textsf{#1}}\normalsize}
+\newcommand{\db}[1]{\small\textmd{\textsf{#1}}\normalsize}
+\newcommand{\func}[1]{{\textcolor{dodgerblue} {#1}}}
+\newcommand{\ital}[1]{{\it #1}}
+\newcommand{\bold}[1]{{\bf #1}}
+\newcommand{\under}[1]{{\underline {#1}}}
+
+\newcommand{\red}[1]{{\textcolor{red} {#1}}}
+\newcommand{\blue}[1]{{\textcolor{blue} {#1}}}
+\newcommand{\grey}[1]{{\textcolor{slategrey} {#1}}}
+\newcommand{\sky}[1]{{\textcolor{deepskyblue} {#1}}}
+%\newcommand{\dfo}[1]{{\colorbox{aliceblue}{\color{slategrey} {#1}}}}
+%\colorbox{declared-color1}{\color{declared-color2}{text}}
+
+\newcommand\pbsfig[4]{    % #1=filename, #2=main caption, #3=figure height, #4=short caption
+	\begin{figure}[ht!] %[htbp]
+	\centering
+	\includegraphics[width=6.5in,height=#3in,keepaspectratio=TRUE]{#1.png}
+	% http://xelatex.blogspot.ca/2008/03/newcommand-with-optional-argument.html
+	\ifthenelse{\isempty{#4}}
+		{\caption[#2]{(\emph{#1}) #2}\vspace{-2ex}}
+		{\caption[#4]{(\emph{#1}) #2}\vspace{-2ex}}
+	\label{fig:#1}
+	\end{figure}
+	%\clearpage
+}
+\newcommand\pbstest[4]{    % #1=filename, #2=main caption, #3=figure height, #4=short caption
+	\begin{figure}[ht!] %[htbp]
+	\centering
+	\includegraphics[width=6.5in,height=#3in,keepaspectratio=TRUE]{#1.png}
+	% http://xelatex.blogspot.ca/2008/03/newcommand-with-optional-argument.html
+	\ifthenelse{\isempty{#4}}  %{#2}{#4}% 
+	{\caption[#2]{(\emph{#1}) #2}\vspace{-2ex}}
+	{\caption[#4]{(\emph{#1}) #2}\vspace{-2ex}}
+	\label{fig:#1}
+	\end{figure}
+	%\clearpage
+}
+\newcommand\pbsfigland[3]{    % filename is #1, text is #2, figure height is #3
+	\clearpage
+	\begin{figure}[ht] %[htbp]
+	\begin{minipage}[c]{4.25in}
+	\centering
+	\includegraphics[width=4.0in,height=10in,keepaspectratio=TRUE]{#1.png}
+	\end{minipage}
+	\hspace{0in}
+	\begin{minipage}[c]{4.75in}
+	\centering
+	\includegraphics[width=4.25in,height=10in,keepaspectratio=TRUE]{#2.png}
+	\end{minipage}
+	\caption{#3}\vspace{-2ex}
+	\label{fig:#1}
+	\end{figure}
+}
+\newcommand\example[1]{    % #1 = function name (or any text) for example line.
+	\textbf{\emph{Example~(#1):}}\\ \vspace{3 pt}
+}
+\newcommand\results[1]{    % #1 = function name (or any text) for example line.
+	\textbf{\emph{Output~(#1):}}\\ \vspace{3 pt}
+}
+% Coloured box environment
+% Source: Manifold @ http://answers.google.com/answers/threadview?id=282787
+\makeatletter\newenvironment{dfobox}{%
+   \begin{lrbox}{\@tempboxa}\begin{minipage}{\columnwidth}\raggedright}{\end{minipage}\end{lrbox}%
+   \colorbox{moccasin}{\usebox{\@tempboxa}}
+}\makeatother
+
+% Example box environment
+% Source: Manifold @ http://answers.google.com/answers/threadview?id=282787
+\makeatletter\newenvironment{examplebox}{%
+   \begin{lrbox}{\@tempboxa}\begin{minipage}{\textwidth}\raggedright}{\end{minipage}\end{lrbox}%
+   \colorbox{aliceblue}{\usebox{\@tempboxa}}
+}\makeatother
+
+% Output box environment
+% Source: Manifold @ http://answers.google.com/answers/threadview?id=282787
+\makeatletter\newenvironment{outputbox}{%
+   \begin{lrbox}{\@tempboxa}\begin{minipage}{\textwidth}\raggedright}{\end{minipage}\end{lrbox}%
+   \colorbox{honeydew}{\usebox{\@tempboxa}}
+}\makeatother
+
+% Get rid of all that margin space
+\topmargin -0.5in 
+\oddsidemargin 0in \evensidemargin 0in
+\textheight 9.0in \textwidth 6.5in
+
+% Undoing the dumb defaults for float
+% http://mintaka.sdsu.edu/GF/bibliog/latex/floats.html
+% Alter some LaTeX defaults for better treatment of figures:
+% See p.105 of "TeX Unbound" for suggested values.
+% See pp. 199-200 of Lamport's "LaTeX" book for details.
+% General parameters, for ALL pages:
+  \renewcommand{\topfraction}{0.9}	% max fraction of floats at top
+  \renewcommand{\bottomfraction}{0.8}	% max fraction of floats at bottom
+% Parameters for TEXT pages (not float pages):
+  \setcounter{topnumber}{2}
+  \setcounter{bottomnumber}{2}
+  \setcounter{totalnumber}{4}     % 2 may work better
+  \setcounter{dbltopnumber}{2}    % for 2-column pages
+  \renewcommand{\dbltopfraction}{0.9}	% fit big float above 2-col. text
+  \renewcommand{\textfraction}{0.07}	% allow minimal text w. figs
+% Parameters for FLOAT pages (not text pages):
+  \renewcommand{\floatpagefraction}{0.7}	% require fuller float pages
+% N.B.: floatpagefraction MUST be less than topfraction !!
+  \renewcommand{\dblfloatpagefraction}{0.7}	% require fuller float pages
+
+%Latex: Squeezing the Vertical White Space
+%http://www.terminally-incoherent.com/blog/2007/09/19/latex-squeezing-the-vertical-white-space/
+\usepackage[compact]{titlesec}
+\titlespacing{\section}{0pt}{*0}{*0}
+\titlespacing{\subsection}{0pt}{*0}{*0}
+\titlespacing{\subsubsection}{0pt}{*0}{*0}
+
+%===========================================================
+\begin{document}
+\pagenumbering{roman}
+
+\title{PBSplankton: User's Guide}
+\author{Rowan Haigh and Lyse Godbout}
+
+\maketitle
+\tableofcontents
+\listoftables % (lot)
+\listoffigures % (lof)
+%\clearpage
+%\fancyfoot[R]{\small \date{}}
+
+\clearpage
+\begin{minipage}{\textwidth}
+\vspace*{4in}
+\begin{center}
+\LARGE\it\grey{Page left blank for printing purposes.}
+\end{center}
+\vfill % equivalent to \vspace{\fill}
+\end{minipage}
+
+%\vspace{4.0 in}
+%\centerline{\large\it\grey{Page left blank for printing purposes.}\normalsize}
+%-------------------------------------------------
+\newpage
+\pagenumbering{arabic}
+
+\phantomsection
+\addcontentsline{toc}{section}{What is PBSplankton?} % Adds to bookmarks only
+\section* {What is PBSplankton?}
+%\addcontentsline{toc}{section}{\protect\numberline{}What is PBSplankton?}
+
+\tab \href{https://github.com/pbs-software/pbs-plankton}{\pkg{PBSplankton}} provides an R interface for algorithms used in biological (and fisheries) oceanography. The scope of this package is by no means comprehensive. Many of the functions provide a quick way to visualize data, and in some cases perform preliminary analyses. Though oriented to users at the Pacific Biological Station (PBS), these functions may prove to be useful to users at other locales. The User's Guide is organised into sections that loosely classify the functions by theme -- (1)~Utility, (2)~Temporal, and (3)~Satellite. Within each section, the functions are described alphabetically.
+
+\tab Additional functions geared toward fisheries can be found in the package \href{https://github.com/pbs-software/pbs-tools}{\pkg{PBStools}}, upon which \pkg{PBSsatellite} depends.
+In turn, \pkg{PBStools} depends heavily on two other R package: \href{https://github.com/pbs-software/pbs-mapping}{\pkg{PBSmapping}} \citep{Schnute-etal:2004b,Boers-etal:2004} and \href{https://github.com/pbs-software/pbs-modelling}{\pkg{PBSmodelling}} \citep{Schnute-etal:2006}.
+\pkg{PBSplankton} has a dedicated temporary working environment called \code{.PBSptonEnv}.
+Accessor functions called \code{ptget}, \code{ptcall}, and \code{ptprint} enable the user to get, call, and print objects from the \code{.PBSptonEnv} environment, while \code{ptput} puts (writes) obects to \code{.PBSptonEnv}.
+
+%-------------------------------------------------
+\phantomsection
+\addcontentsline{toc}{section}{What is PBS?} % Adds to bookmarks only
+\subsection* {What is PBS?}
+%\addcontentsline{toc}{subsection}{\protect\numberline{}What is PBS?}
+
+\tab The \href{http://www.pac.dfo-mpo.gc.ca/science/facilities-installations/pbs-sbp/index-eng.html}{Pacific Biological Station} is the oldest fisheries research centre on Canada's Pacific coast and forms part of a network of nine major scientific facilities operated by Fisheries and Oceans Canada. Located in Nanaimo, British Columbia, the Station is home to scientists, technicians, support staff and ships' crews whose common interests are the coastal waters of British Columbia, the Northeast Pacific Ocean, the Western Arctic and navigable waters east to the Manitoba, Saskatchewan border.
+
+\tab PBS was established in 1908 and is the principal centre for fisheries research on Canada's west coast. There are some 22 structures on the site including a four-story office/wet lab building, specialty storage structures for hazardous chemicals and salt water pumping facilities. PBS maintains a number of workshops for research support. There is a wharf used for loading, unloading, and berthage of research vessels, as well as a small boat dock for inshore research boats. PBS also maintains a library and meeting facilities. Aquatic facilities, primarily used by Aquaculture Science, include ambient temperature and heated salt water and fresh water. 
+
+\tab Research at PBS responds to stock assessment, aquaculture, marine environment, habitat, ocean science, and fish productivity priorities. Some fisheries management activities are also conducted here.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=10cm]{PBS.png}
+	\quad
+	\caption{Pacific Biological Station (PBS), Nanaimo BC}
+	\label{fig:PBS}
+\end{figure}
+
+\clearpage
+%\setcounter{section}{1}
+%-------------------------------------------------
+\section {Utility functions}
+
+\tab The utility functions described in this section (non thus far) cover a broad range of activities. The number of functions has grown over time and inevitably, some of the functions may replicate the behaviour of functions in other packages. Additionally, the utility of these functions can either decline or cease based on changes in dependent packages.
+
+%\clearpage  % end of section
+
+%-------------------------------------------------
+\section {Temporal Functions}
+
+\tab Temporal functions help scientists see how populations change over time. Here we present a few that visualize changes in species composition and diversity for phytoplankton samples. The functions could be applied equally to any taxonomic collection. We often think of such collections as marine species portfolios. Monitoring the diversity of species portfolios can alert us to changes in an ecosystem's resilience. \citet{Haigh-Schnute:2003} explored diversity patterns for fish species composition of commercial catch tows in the longspine thornyhead (\emph{Sebastolobus altivelis}) fishery.
+
+\subsection {boxSeason}
+
+\tab Summarize time-dependent data using boxplots to group by a specified period pattern (Figure~\ref{fig:PBSplankton-boxSeason}). The data file imported from a Microsoft Access table or query called \code{fqtName} must contain a field called either \code{YMD} or \code{Date} that depicts the date values as strings with format \code{YYYY-MM-DD}.
+
+\begin{examplebox}
+\example{boxSeason}
+\begin{Verbatim}[fontsize=\footnotesize]
+pbsfun=function(os=.Platform$OS.type, arch=.Platform$r_arch) {
+  if (os=="windows" && arch=="i386")
+    boxSeason(fld="S",brks="M",path=system.file("examples",package="PBSplankton"))
+  else 
+    showMessage("Only functional for Microsoft Access on 32-bit Windows OS")
+  invisible() }
+pbsfun()
+\end{Verbatim}
+\end{examplebox}
+\pbsfig{PBSplankton-boxSeason}{Number of phytoplankton species observed in samples grouped by month.}{3.0}{Number of phytoplankton species observed by month}
+
+\subsection {plotDiversity}
+
+\tab Plot sample diversity (e.g., Shanon-Wiener diversity index $H$) as a barplot with an overlay of points using some other index (e.g., species richness $S$). The arguments \code{bars} and \code{pnts} can each be one of \code{H}~= Shannon-Diversity index, \code{S}~= species richness, or \code{E}~= species evenness. The user can also choose to add lowess-fitted lines through the bars and the points (Figure~\ref{fig:PBSplankton-plotDiversity}).
+
+\begin{examplebox}
+\example{plotDiversity}
+\begin{Verbatim}[fontsize=\footnotesize]
+pbsfun=function(os=.Platform$OS.type,arch=.Platform$r_arch) {
+  if (os=="windows" && arch=="i386")
+    plotDiversity(bars="H",pnts="S",xnames="Batch", 
+      path=system.file("examples",package="PBSplankton"))
+  else 
+    showMessage("Only functional for Microsoft Access on 32-bit Windows OS")
+  invisible() }
+pbsfun()
+\end{Verbatim}
+\end{examplebox}
+\pbsfig{PBSplankton-plotDiversity}{Shannon-Wiener diversity index $H$ (bars) for phytoplankton samples. Species richness $S$ (numbers of species observed) appear as points. Smooth trend lines through $H$ and $S$ are calculated using the \pkg{stats} function \code{lowess}, which uses a locally-weighted polynomial regression.}{3.5}{Shannon-Wiener diversity index for phytoplankton samples}
+
+\subsection {trackComp}
+
+\tab Track the mean composition of phytoplankton groups over time using a specified binning interval. The function creates a stacked line plot of relative composition frequencies for each group (Figure~\ref{fig:PBSplankton-trackComp}).
+
+\begin{examplebox}
+\example{trackComp}
+\begin{Verbatim}[fontsize=\footnotesize]
+pbsfun=function(os=.Platform$OS.type,arch=.Platform$r_arch) {
+  if (os=="windows" && arch=="i386")
+    trackComp(ndays=15,path=system.file("examples",package="PBSplankton"))
+  else 
+    showMessage("Only functional for Microsoft Access on 32-bit Windows OS")
+  invisible() }
+pbsfun()
+\end{Verbatim}
+\end{examplebox}
+\pbsfig{PBSplankton-trackComp}{Relative composition frequency of major phytoplankton groups in samples over time. The binning interval spans 15 days.}{3.5}{Relative composition frequency of major phytoplankton groups}
+
+\clearpage
+
+%-------------------------------------------------
+\section {Satellite Data Functions}
+
+Something here (maybe from PBSsatellite)...
+
+\subsection {calcChloro}
+
+
+
+%-----CONTACT-----
+%\vspace*{4ex} \noindent {\bf \Large Contact}\\
+\vspace*{2ex}
+\phantomsection
+\addcontentsline{toc}{section}{Contact Information} % Adds to bookmarks only
+%\addcontentsline{toc}{section}{\protect\numberline{}Contact Information}
+\section* {Contact Information}
+\vspace*{2ex} \noindent \blue{{\bf \normalsize Rowan Haigh}}\\
+\small
+\grey{Research Biologist, Groundfish Section\\
+Marine Ecosystems and Aquaculture Division\\
+Fisheries and Oceans Canada\\
+Pacific Biological Station, Nanaimo, BC  V9T 6N7}\\
+\sky{Tel. +1 250-756-7123  fac simile +1 250-756-7053\\
+Email rowan.haigh@dfo-mpo.gc.ca} 
+\normalsize
+
+\clearpage
+
+\bibliographystyle{jss}
+%\addcontentsline{toc}{section}{\protect\numberline{}References}
+\phantomsection
+\addcontentsline{toc}{section}{References}
+\bibliography{PBSrefs}
+
+\end{document}
+
