@@ -42,7 +42,8 @@ trackComp(fqtName=c("Ex01_Sample_Info","Ex02_Species_Abundance"),
   global list object \code{PBStool}.
 }
 \author{
-  Rowan Haigh, Pacific Biological Station, Fisheries and Oceans Canada, Nanaimo BC
+  Rowan Haigh, Research Biologist, \cr
+  Fisheries and Oceans Canada, Pacific Biological Station, Nanaimo BC.
 }
 \seealso{
   \code{\link[PBSplankton]{boxSeason}},

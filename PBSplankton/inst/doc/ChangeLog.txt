@@ -2,7 +2,14 @@ PBSplankton Changes
 ==============================
 Authors: RH  = Rowan Haigh
          LG  = Lyse Godbout
+         NB  = Nicholas Boers
 ------------------------------
+
+0.2.0 (2016-04-28)
+  • Added function `calcChloro' to smooth satellite  chlorophyll data and estimate bloom magnitude and duration. (RH 160428)
+  • Added function `calcDeriv' which is used by `calcChloro'. (RH 160426)
+  • Updated the Rnw-based User's Guide. (RH 160426)
+  • Updated data object `phytospp' to have Latex-compatible symbols. (RH 160426)
 
 0.1.0 (2016-04-25)
   • Started User's Guide for PBSplankton. (RH 160425)

@@ -65,7 +65,8 @@ plotDiversity(fqtName="Ex01_Sample_Info",dbName="Examples.mdb",
   \emph{North American Journal of Fisheries Management} \bold{23}: 120--140.
 }
 \author{
-  Rowan Haigh, Pacific Biological Station, Fisheries and Oceans Canada, Nanaimo BC
+  Rowan Haigh, Research Biologist, \cr
+  Fisheries and Oceans Canada, Pacific Biological Station, Nanaimo BC.
 }
 \seealso{
   \code{\link[PBSplankton]{boxSeason}},

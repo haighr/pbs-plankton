@@ -1,10 +1,11 @@
 #===============================================================================
-# Module 2: Temporal
-# ------------------
+# Module 2: Samples
+# -----------------
 #  boxSeason.......Show seasonal data using boxplots.
 #  plotDiversity...Plot diversity as barplots and overlay species richness.
 #  trackComp.......Track the composition of phytoplankton groups
 #===============================================================================
+
 
 #boxSeason------------------------------2016-04-25
 # Show seasonal data using boxplots.

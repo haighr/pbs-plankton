@@ -6,13 +6,13 @@ exportPattern("^\\.PBS")
 
 # Packages declared in the 'Depends' field should not also be in the 'Imports' field (I guess in DESCRIPTION file only) (from R-exts.pdf).
 import(
-  PBStools
+  PBStools, numDeriv
 )
 
 # writeLines(imports_for_undefined_globals(txt))
-importFrom("grDevices", "colorRamp", "dev.off", "extendrange", "rgb")
+importFrom("grDevices", "colorRamp", "dev.cur", "dev.list", "dev.off", "extendrange", "rgb")
 importFrom("graphics", "abline", "axis", "barplot", "box", "boxplot",
            "legend", "lines", "mtext", "par", "plot", "points",
            "polygon", "text")
-importFrom("stats", "lowess")
+importFrom("stats", "integrate", "loess", "lowess", "median", "predict")
 

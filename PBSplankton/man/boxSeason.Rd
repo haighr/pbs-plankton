@@ -32,7 +32,7 @@ boxSeason(fqtName="Ex01_Sample_Info", dbName="Examples.mdb",
 }
 \author{
   Rowan Haigh, Research Biologist, \cr
-  Pacific Biological Station, Fisheries and Oceans Canada, Nanaimo BC.
+  Fisheries and Oceans Canada, Pacific Biological Station, Nanaimo BC.
 }
 \seealso{
   \code{\link[PBSplankton]{plotDiversity}},

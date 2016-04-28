@@ -14,7 +14,7 @@
 
 	packageStartupMessage("
 -----------------------------------------------------------
-PBS Plankton ", pkg_info$Version, " -- Copyright (C) 2016-",year," Fisheries and Oceans Canada
+PBS Plankton ", pkg_info$Version, " -- Copyright (C) 2013-",year," Fisheries and Oceans Canada
 
 A complete user guide 'PBSplankton-UG.pdf' is located at 
 ", userguide_path, "
@@ -25,7 +25,7 @@ Pacific Biological Station, Nanaimo
 All available PBS packages can be found at
 https://github.com/pbs-software
 
-We may not be big, but we're small.
+Plankton -- from samples to satellites.
 -----------------------------------------------------------
 
 ")
@@ -37,16 +37,17 @@ We may not be big, but we're small.
 # No Visible Bindings
 # ===================
 if(getRversion() >= "2.15.1") utils::globalVariables(names=c(
-		"addLegend",
+		".findSquare",
+		"addLabel", "addLegend",
 		"clipVector",
+		"deriFunc",
 		"expandGraph",
+		"hessFunc",
 		"lisp",
-		"packList", "PBSdat",
+		"packList", "pad0", "PBSdat", "predFunc",
 		"resetGraph",
 		"tcall", "tget", "tprint", "tput",
 		"unpackList",
 		"ylim", "ypos", "ytck"
 	), package="PBSplankton")
-
-
 

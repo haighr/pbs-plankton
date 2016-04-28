@@ -15,12 +15,12 @@
    \code{code}       \tab character \tab Six-letter code where typically the first three letters refer to the genus \cr
                      \tab           \tab and the last three letters refer to the species. If the species is not known, \cr 
                      \tab           \tab then the six letters refer to the genus. \cr
-   \code{species}    \tab character \tab Species name in latin (no common names exist). Note that codes may refer to \cr
-                     \tab           \tab previously recognised taxonomic names; however, the field \code{species} will \cr
-                     \tab           \tab report the currently acceptable name. \cr
+   \code{species}    \tab character \tab Species name in latin (used because no common names exist). Note that codes \cr
+                     \tab           \tab may refer to previously recognised taxonomic names; however, the field \cr
+                     \tab           \tab \code{species} will report the currently acceptable name. \cr
    \code{class}      \tab character \tab Taxonomic class of the species. \cr
    \code{type}       \tab character \tab Simplified description of class (usually without the suffix \sQuote{phyceae}). \cr
-   \code{toxin}      \tab character \tab Acronym describing a potential suite of toxins (e.g., PSP). \cr
+   \code{toxin}      \tab character \tab Acronym describing a potential suite of toxins (e.g., ASP, DSP, PSP). \cr
    \code{group}      \tab character \tab General category of microplankton for summary purposes. \cr
    \code{gras}       \tab logical   \tab If \code{TRUE}, species is \sQuote{Generally Recognised As Safe}; potentially fallible at present. \cr
    \code{authority}  \tab character \tab Taxonomic source description for currently accepted name. \cr
@@ -29,9 +29,8 @@
                      \tab           \tab from which a new name is formed for a taxon of different rank or position. \cr
    \code{homotype}   \tab character \tab Homotypic synonyms -- names that have same (holo)type and same taxonomic rank. \cr
    \code{heterotype} \tab character \tab Heterotypic synonyms -- names that have different (holo)types. \cr
-   \code{water}      \tab character \tab Habitat code (B=brakish, F=fresh, M=marine) \cr
+   \code{water}      \tab character \tab Habitat code (B=brackish, F=fresh, M=marine) \cr
    \code{sog}        \tab logical   \tab If \code{TRUE}, the species is found in the Strait of Georgia. \cr
-   \code{nacp}       \tab logical   \tab If \code{TRUE}, the species is found in the North American Carbon Program. \cr
    \code{bc}         \tab logical   \tab If \code{TRUE}, the species is found in British Columbia.
   }
 }
@@ -43,8 +42,8 @@
   phytoplankton: \href{http://www.algaebase.org}{AlgaeBase}
 }
 \source{
-  Rowan Haigh, Research Biologist,\cr
-  Pacific Biological Station, Fisheries and Oceans Canada, Nanaimo BC
+  Rowan Haigh, Research Biologist, \cr
+  Fisheries and Oceans Canada, Pacific Biological Station, Nanaimo BC.
 }
 \references{
   Haigh, R. (1988) 

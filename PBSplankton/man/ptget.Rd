@@ -44,8 +44,8 @@ plisp(...)
   user may wish to call, for example, \code{ptcall(myfunc)()}.
 }
 \author{
-  Rowan Haigh, Research Biologist,\cr
-  Pacific Biological Station, Fisheries and Oceans Canada, Nanaimo BC
+  Rowan Haigh, Research Biologist, \cr
+  Fisheries and Oceans Canada, Pacific Biological Station, Nanaimo BC.
 }
 \seealso{
 \code{\link[PBSmodelling]{tget}} and \code{\link[PBSmodelling]{lisp}} in \pkg{PBSmodelling}

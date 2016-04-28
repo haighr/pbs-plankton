@@ -39,9 +39,9 @@ urlcolor=blue,%
 pdfstartview=Fit, %{XYZ null null 1},%
 pdfview={XYZ null null null},%
 pdfpagemode=UseOutlines,% for bookmarks
-pdfauthor={Rowan Haigh and Jon T. Schnute},%
+pdfauthor={Rowan Haigh and Lyse Godbout},%
 pdftitle={PBSplankton User's Guide},%
-pdfsubject={Software for semi-serious scientists}%
+pdfsubject={Plankton from samples to satellites}%
 }
 
 \raggedright
@@ -51,6 +51,11 @@ pdfsubject={Software for semi-serious scientists}%
 \def\tab{\hspace{0.5 in}}
 \newcommand\tstrut{\rule{0pt}{2.4ex}}         % top strut for table row
 \newcommand\bstrut{\rule[-1.0ex]{0pt}{0pt}}   % bottom strut for table row
+
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+
 
 % For colors
 \usepackage{color}
@@ -67,16 +72,16 @@ pdfsubject={Software for semi-serious scientists}%
 
 % Definitions
 %\newfont{inc}{inconsolata} 
-\newcommand{\slan}{{\tt S}}
-\newcommand{\rlan}{{\tt R}}
-\newcommand{\pbsd}{{\tt PBSdata}}
-\newcommand{\pbsf}{{\tt PBSfishery}}
-\newcommand{\pbst}{{\tt PBSplankton}}
-\newcommand{\pbsdat}{{\it PBS Data}}
+\newcommand{\pbsmap}{\textbf{PBSmapping}}
+\newcommand{\pbsmod}{\textbf{PBSmodelling}}
+\newcommand{\pbst}{\textbf{PBStools}}
+\newcommand{\pbsp}{\textbf{PBSplankton}}
+\newcommand{\pbss}{\textbf{PBSsatellite}}
 \newcommand{\tcl}{{\tt Tcl/Tk}}
 
 % from RODBC.Rnw
-\newcommand{\code}[1]{\normalsize\texttt{#1}\normalsize}
+%\newcommand{\code}[1]{\normalsize\texttt{#1}\normalsize}
+\newcommand{\code}[1]{\texttt{#1}}
 \newcommand{\pkg}[1]{{\bf #1}}
 \newcommand{\var}[1]{\emph{#1}}
 \newcommand{\link}[1]{#1}
@@ -231,15 +236,15 @@ pdfsubject={Software for semi-serious scientists}%
 
 \phantomsection
 \addcontentsline{toc}{section}{What is PBSplankton?} % Adds to bookmarks only
-\section* {What is PBSplankton?}
+\section* {What is \pbsp?}
 %\addcontentsline{toc}{section}{\protect\numberline{}What is PBSplankton?}
 
-\tab \href{https://github.com/pbs-software/pbs-plankton}{\pkg{PBSplankton}} provides an R interface for algorithms used in biological (and fisheries) oceanography. The scope of this package is by no means comprehensive. Many of the functions provide a quick way to visualize data, and in some cases perform preliminary analyses. Though oriented to users at the Pacific Biological Station (PBS), these functions may prove to be useful to users at other locales. The User's Guide is organised into sections that loosely classify the functions by theme -- (1)~Utility, (2)~Temporal, and (3)~Satellite. Within each section, the functions are described alphabetically.
+\tab \href{https://github.com/pbs-software/pbs-plankton}{\pbsp} provides an R interface for algorithms used in biological (and fisheries) oceanography. The scope of this package is by no means comprehensive. Many of the functions provide a quick way to visualize data, and in some cases perform preliminary analyses. Though oriented to users at the Pacific Biological Station (PBS), these functions may prove to be useful to users at other locales. The User's Guide is organised into sections that loosely classify the functions by theme -- (1)~Utility, (2)~Temporal, and (3)~Satellite. Within each section, the functions are described alphabetically.
 
-\tab Additional functions geared toward fisheries can be found in the package \href{https://github.com/pbs-software/pbs-tools}{\pkg{PBStools}}, upon which \pkg{PBSsatellite} depends.
-In turn, \pkg{PBStools} depends heavily on two other R package: \href{https://github.com/pbs-software/pbs-mapping}{\pkg{PBSmapping}} \citep{Schnute-etal:2004b,Boers-etal:2004} and \href{https://github.com/pbs-software/pbs-modelling}{\pkg{PBSmodelling}} \citep{Schnute-etal:2006}.
-\pkg{PBSplankton} has a dedicated temporary working environment called \code{.PBSptonEnv}.
-Accessor functions called \code{ptget}, \code{ptcall}, and \code{ptprint} enable the user to get, call, and print objects from the \code{.PBSptonEnv} environment, while \code{ptput} puts (writes) obects to \code{.PBSptonEnv}.
+\tab Additional functions geared toward fisheries can be found in the package \href{https://github.com/pbs-software/pbs-tools}{\pbst}, upon which \pbsp{} depends.
+In turn, \pbst{} depends heavily on two other R packages: \href{https://github.com/pbs-software/pbs-mapping}{\pbsmap} \citep{Schnute-etal:2004b,Boers-etal:2004} and \href{https://github.com/pbs-software/pbs-modelling}{\pbsmod} \citep{Schnute-etal:2006}.
+\pbsp{} has a dedicated temporary working environment called \code{.PBSptonEnv}.
+Accessor functions called \code{ptget}, \code{ptcall}, and \code{ptprint} enable the user to get, call, and print objects from the \code{.PBSptonEnv} environment, while \code{ptput} puts (writes) objects to \code{.PBSptonEnv}.
 
 %-------------------------------------------------
 \phantomsection
@@ -264,9 +269,58 @@ Accessor functions called \code{ptget}, \code{ptcall}, and \code{ptprint} enable
 \clearpage
 %\setcounter{section}{1}
 %-------------------------------------------------
+\section*{Datasets}
+
+\subsection*{phytospp}
+
+A data frame of phytoplankton species described primarily by six-letter codes (Table~\ref{tab:phytospp}).
+Heterotrophic micro- and nanoplankton species also appear in the code table.
+Codes are those created originally by \citep{Haigh:1988} and only represent a small fraction of the numerous microplankton species.
+Information on taxonomy comes from the online databases -- phytoplankton: \href{http://www.algaebase.org}{AlgaeBase}.
+
+\usefont{\encodingdefault}{\familydefault}{\seriesdefault}{\shapedefault}\small
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{L{0.75in}C{0.75in}L{4.5in}}
+\caption{Taxonomic codes for micro- and nanoplankton from coastal temperate marine waters, primarily along the coast of British Columbia.}
+\label{tab:phytospp}\\
+\hline\\[-1.5ex]
+Field  & Class & Description \\[0.2ex]\hline\\[-1.5ex]  \endfirsthead
+\multicolumn{3}{l}{{\tablename\ \thetable{} -- continued from previous page}}\\  \hline
+Field  & Class & Description \\[0.2ex]\hline\\[-1.5ex]  \endhead \hline\\[-2.2ex]
+\multicolumn{3}{r}{{\footnotesize \emph{Continued on next page}}}\\  \endfoot  \hline \endlastfoot
+  \code{code}       & character & Six-letter code where typically the first three letters refer to the genus and the last three letters refer to the species. If the species is not known, then the six letters refer to the genus.\\
+  \code{species}    & character & Species name in latin (used because no common names exist). Note that codes may refer to  previously recognised taxonomic names; however, the field \code{species} will report the currently acceptable name.\\
+  \code{class}      & character & Taxonomic class of the species.\\
+  \code{type}       & character & Simplified description of class (usually without the suffix \sQuote{phyceae}).\\
+  \code{toxin}      & character & Acronym describing a potential suite of toxins (e.g., PSP).\\
+  \code{group}      & character & General category of microplankton for summary purposes.\\
+  \code{gras}       & logical   & If \code{TRUE}, species is \sQuote{Generally Recognised As Safe}; potentially fallible at present.\\
+  \code{authority}  & character & Taxonomic source description for currently accepted name.\\
+  \code{holotype}   & logical   & If \code{TRUE}, species is the holotype for the genus.\\
+  \code{basionym}   & character & A previously published legitimate name-bringing or epithet-bringing synonym from which a new name is formed for a taxon of different rank or position.\\
+  \code{homotype}   & character & Homotypic synonyms -- names that have same (holo)type and same taxonomic rank.\\
+  \code{heterotype} & character & Heterotypic synonyms -- names that have different (holo)types.\\
+  \code{water}      & character & Habitat code (B=brackish, F=fresh, M=marine)\\
+  \code{sog}        & logical   & If \code{TRUE}, the species is found in the Strait of Georgia.\\
+%  \code{nacp}       & logical   & If \code{TRUE}, the species is flagged for use when considering the North American Carbon Program. (Currently this field is not populated coherently.)\\
+  \code{bc}         & logical   & If \code{TRUE}, the species is found in British Columbia.\\
+\hline
+\end{longtable}
+\usefont{\encodingdefault}{\familydefault}{\seriesdefault}{\shapedefault}\normalsize
+
+
+
+
+%-------------------------------------------------
 \section {Utility functions}
 
 \tab The utility functions described in this section (non thus far) cover a broad range of activities. The number of functions has grown over time and inevitably, some of the functions may replicate the behaviour of functions in other packages. Additionally, the utility of these functions can either decline or cease based on changes in dependent packages.
+
+\subsection {ptget, ptcall, ptprint, ptput, plisp}
+
+\tab These functions are wrappers to the \pkg{PBSmodelling} accessor functions (\code{tget}, \code{tcall}, \code{tprint}, \code{tput}, and \code{lisp}) that get/print/list objects from or put objects into a temporary work environment, in this case \code{.PBSptonEnv}.
+%Working objects include \code{PBStool}, which acts as a storage object for many of the functions. 
+These accessor functions were developed as a response to the CRAN repository policy statement: \dQuote{Packages should not modify the global environment (user's workspace).} 
 
 %\clearpage  % end of section
 
@@ -335,7 +389,14 @@ pbsfun()
 %-------------------------------------------------
 \section {Satellite Data Functions}
 
-Something here (maybe from PBSsatellite)...
+\subsection{\pbss}
+
+\pbss{} is a collaborative effort between the Pacific Biological Station (PBS) and MacEwan University to design software that simplifies the extraction and statistical analysis of gridded satellite data.
+This software uses \pbsmap, an existing R software package, to produce plots.
+%The tools provided in this package provide users with the functionality necessary to accomplish statistical analysis from a myriad of satellite data sources.
+Additionally, users are able to produce their own functionality and data interpretation algorithms and incorporate these functions into the package's
+analysis methods. 
+This provides users with a platform that simplifies the complex problem of satellite data analysis and visualization while providing the ability for personal research and method integration.
 
 \subsection {calcChloro}
 
