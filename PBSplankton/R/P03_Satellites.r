@@ -3,6 +3,9 @@
 # --------------------
 #  calcChloro......Calculate chlorophyll peaks and integrate.
 #  calcDeriv.......Calculate derivatives of loess-smoothe curve.
+#  createDpoly.....Create a depth polygon from a single isobath.
+#  diffGeo.........Difference a geospatial object (in km).
+#  findDpoly.......Find satellite chlorophyll events in a depth polygon.
 #===============================================================================
 
 
@@ -434,4 +437,189 @@ calcDeriv <- function(x,y,span=0.5)
 	return(result)
 }
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~calcDeriv
+
+
+#createDpoly----------------------------2016-05-06
+# Create a depth polygon from a single isobath.
+#-----------------------------------------------RH
+createDpoly = function(isob=1000, corner=c("TR","BR"),
+   xbox=c(-134,-134,-124.5,-124.5), ybox=c(48,54.4,54.4,48),
+   seePlot=FALSE)
+{
+	if (!isob %in% seq(100,1800,100)) stop("Choose one iobath from 100 to 1800 by incremenst of 100")
+	abox = as.PolySet(data.frame(PID=rep(1,4),POS=1:4,X=xbox,Y=ybox),projection="LL")
+	amid = calcCentroid(abox)
+	data(isobath)
+	isoLine = isoPoly = isobath[is.element(isobath$PID,isob),]
+	isoPoly$Y[1] = min(ybox)
+	isoPoly$Y[nrow(isoPoly)] = max(ybox)
+	for (i in corner) {
+		z = switch(match(i,c("BL","TL","TR","BR")),
+			{xbox<amid$X & ybox<amid$Y},
+			{xbox<amid$X & ybox>amid$Y},
+			{xbox>amid$X & ybox>amid$Y},
+			{xbox>amid$X & ybox<amid$Y} )
+		isoPoly = rbind(isoPoly,data.frame(c(isoPoly[nrow(isoPoly),1:3]+c(0,0,1),X=xbox[z],Y=ybox[z])) )
+	}
+	save("isoPoly",file="isoPoly.rda")
+
+	if (seePlot) {
+		exlim = extendrange(isoPoly$X)
+		eylim = extendrange(isoPoly$Y)
+		data(nepacLLhigh)
+		bccoast = clipPolys(nepacLLhigh,xlim=exlim,ylim=eylim)
+		expandGraph()
+		plotMap(bccoast,xlim=exlim,ylim=eylim,col="moccasin",plt=NULL)
+		addPolys(isoPoly,border="blue",col=lucent("blue",0.2))
+	}
+	return(invisible(isoPoly))
+}
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~createDpoly
+
+
+#diffGeo--------------------------------2016-05-05
+# Transform a geographic object into a coordinate
+# system with units in kilometres and an origin
+# near zero or centered on the mean.
+#--------------------------------------------TD/RH
+diffGeo <- function(dat, offset.from.zero=0.1, 
+   xfld="X", yfld="Y", center=TRUE, replace=FALSE, centroid=NULL)
+{
+	## constants
+	dat$X = dat[,xfld]; dat$Y = dat[,yfld]
+	user.centroid = centroid
+	centroid =list()
+	centroid[["usr"]] = user.centroid
+	centroid[["old"]] = c(mean(dat$X, na.rm=TRUE), mean(dat$Y, na.rm=TRUE))
+	minX  = min(dat$X) - offset.from.zero ## minimum LON
+	minY  = min(dat$Y) - offset.from.zero ## minimum LAT
+	
+	proj  = attributes(dat)$projection
+	is.deg = !is.null(proj) && proj=="LL"
+	if (is.deg) {
+		deg2rad =  180/pi          ## degrees to radians (if degrees)
+		rminX   = minX/deg2rad
+		rminY   = minY/deg2rad
+		R       = 6371.2           ## radius (km) of Earth
+
+		## geometric calculations (also see function `calcGCdist')
+		convRX = function(radX,rminX,radY,R) { ## convert radians to X-values (km)
+			difX   = abs(radX-rminX)
+			betaX  = sin(radY)*sin(radY) + cos(radY)*cos(radY)*cos(difX)  ## hold Y constant
+			betaX  = acos(betaX)
+			Xe = R * betaX
+		}
+		convRY = function(radY,rminY,R) { ## convert radians to Y-values (km)
+			betaY  = sin(radY)*sin(rminY) + cos(radY)*cos(rminY)
+			betaY  = acos(betaY)
+			Yn = R * betaY
+		}
+		radX   = dat$X/deg2rad
+		radY   = dat$Y/deg2rad
+		dat$Xe = convRX(radX,rminX,radY,R)
+		dat$Yn = convRY(radY,rminY,R)
+	} else {
+		dat$Xe = dat$X
+		dat$Yn = dat$Y
+	}
+	if (center) {
+		if (!is.null(centroid[["usr"]])){
+			if (is.deg) {
+				uX = convRX(centroid$usr[1]/deg2rad,rminX,centroid$usr[2]/deg2rad,R)
+				uY = convRY(centroid$usr[2]/deg2rad,rminY,R)
+			} else {
+				uX = centroid$usr[1]  ## be sure to standardise the zone across multiple
+				uY = centroid$usr[2]  ## objects when converting to UTM using `convUL'.
+			}
+			centroid[["new"]] = c(uX, uY)
+		} else
+			centroid[["new"]] = c(mean(dat$Xe, na.rm=TRUE), mean(dat$Yn, na.rm=TRUE))
+		dat$cXe = dat$Xe - centroid[["new"]][1]
+		dat$cYn = dat$Yn - centroid[["new"]][2]
+		attr(dat, "centroid") = centroid
+	}
+	if (replace) { ## set the transformed coordinates to the primary X & Y
+		dat$X.orig = dat$X
+		dat$Y.orig = dat$Y
+		dat$X = if (center) dat$cXe else dat$Xe
+		dat$Y = if (center) dat$cYn else dat$Yn
+	}
+	attr(dat,"projection") = 1 
+	attr(dat, "zone") = NULL
+	return(dat)
+}
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~diffGeo
+
+
+#findDpoly------------------------------2016-05-09
+#  Find satellite chorophyll events (gridded) in
+#  a polygon bounded seaward by a depth contour.
+#-----------------------------------------------RH
+findDpoly = function(edata, pdata, zfld="Chl", 
+   latBands, seePlot=TRUE, xlim, ylim, onam="filtered")
+{
+	on.exit(gc(verbose=FALSE))
+
+	### Modify the data
+	eflds = names(edata)
+	if (!all(is.element(c("X","Y"),eflds))){
+		names(edata)[grep("lon",names(edata))]="X"
+		names(edata)[grep("lat",names(edata))]="Y"
+	}
+	### Locate data in isobath polygon
+	events = as.EventData(data.frame(EID=1:nrow(edata),edata),projection="LL")
+	locset = findPolys(events, pdata, maxRows = 1e+06)
+	if (length(locset)==0) stop("No events occur in the target polygon")
+	EinP   = events[is.element(events$EID,sort(unique(locset$EID))),]
+	if (!is.element("id",names(EinP)))
+		EinP$id = paste0(EinP$Y,EinP$X)
+	bucket = split(EinP[,zfld],EinP$id)
+	goodchl= sapply(bucket,function(x){any(x>=0 & x<=30,na.rm=TRUE)})  ## valid chl data
+
+	### Isolate the data into exact polygonal areas
+	egood  = EinP[is.element(EinP$id,names(goodchl)[goodchl]),]
+
+	if (!missing(latBands) && !is.null(latBands)){
+		bgood = list()
+		for (i in 1:length(latBands)) {
+			ii = names(latBands)[i]
+			if (is.null(ii)) ii = paste0("band",i)
+			iii = latBands[[i]]
+			bhave = egood$Y<iii[2] & egood$Y>=iii[1]
+			if (!any(bhave)) next
+			bgood[[ii]] = egood[bhave,]
+		}
+	}
+	if (length(bgood)==0) rm(bgood, envir=penv())
+
+	### Plot the data positions
+	if (seePlot) {
+		if (missing(xlim)) xlim = extendrange(events$X)
+		if (missing(ylim)) ylim = extendrange(events$Y)
+		data(nepacLLhigh)
+		expandGraph(cex=1.5)
+		plotMap(pdata,border="green",col="honeydew",xlim=xlim,ylim=ylim,plt=NULL)
+		abline(h=c(51,52,54))
+		addPolys(nepacLLhigh,col="moccasin")
+		addPoints(EinP,pch=20,col="red")
+		addPoints(egood,pch=20,col="green4")
+		if (exists("bgood",envir=penv())) {
+			bcol = c("blue","gold","purple","orange")
+			bcol = rep(bcol,length(bgood))[1:length(bgood)]
+			for (i in 1:length(bgood))
+				addPoints(bgood[[i]], pch=20, col=bcol[i])
+		}
+	}
+	### Save the data
+	if (exists("bgood",envir=penv()))
+		ogood = bgood
+	else
+		ogood = list(all=egood)
+	omess = paste0(onam,"=ogood; ",
+		"save(\"",onam,"\",file=\"",onam,".rda\")")
+	eval(parse(text=omess))
+	return(invisible(ogood))
+}
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~findDpoly
+
 

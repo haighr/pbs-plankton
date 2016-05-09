@@ -3,7 +3,15 @@ PBSplankton Changes
 Authors: RH  = Rowan Haigh
          LG  = Lyse Godbout
          NB  = Nicholas Boers
+         TD  = Trevor Davies
 ------------------------------
+
+0.3.0 (2016-05-09)
+  • Added function `findDpoly' to find satellite chorophyll events (gridded) in a polygon bounded seaward by a depth contour. (RH 160509)
+  • Added function `createDpoly' to create a depth polygon from a single isobath. (RH 160506)
+  • Added function `transData' to transpose tabulated geo-referenced data from a file into a data frame. (RH 160506)
+  • Added function `dfread' to read a data.frame using the `fread' function from the package `data.table'. (RH 160506)
+  • Added function `diffGeo' to transform a geospatial object's coordinates into Cartesian coordinates. (RH/TD 160506)
 
 0.2.0 (2016-04-28)
   • Added function `calcChloro' to smooth satellite  chlorophyll data and estimate bloom magnitude and duration. (RH 160428)

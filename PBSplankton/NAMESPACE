@@ -10,9 +10,11 @@ import(
 )
 
 # writeLines(imports_for_undefined_globals(txt))
-importFrom("grDevices", "colorRamp", "dev.cur", "dev.list", "dev.off", "extendrange", "rgb")
+importFrom("data.table", "fread")
 importFrom("graphics", "abline", "axis", "barplot", "box", "boxplot",
            "legend", "lines", "mtext", "par", "plot", "points",
            "polygon", "text")
+importFrom("grDevices", "colorRamp", "dev.cur", "dev.list", "dev.off", "extendrange", "rgb")
 importFrom("stats", "integrate", "loess", "lowess", "median", "predict")
+importFrom("utils", "data")
 
