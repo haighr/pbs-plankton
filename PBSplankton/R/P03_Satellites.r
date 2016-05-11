@@ -6,16 +6,16 @@
 #  createDpoly.....Create a depth polygon from a single isobath.
 #  diffGeo.........Difference a geospatial object (in km).
 #  findDpoly.......Find satellite chlorophyll events in a depth polygon.
+#  sliceDpoly......Slice events by year or (X,Y) to summarise Z by julian day.
 #===============================================================================
 
 
-#calcChloro-----------------------------2016-04-28
+#calcChloro-----------------------------2016-05-11
 # Calculate chlorophyll peaks and integrate
 #-----------------------------------------------RH
 calcChloro  = function(dat, wd=getwd(), xfld="period", yfld="Chlo", 
   xint=0.1, span=0.75, diff.required=FALSE, slice=NULL, days.per=8,
-  salmEnd="Jun-15",
-  show=c(fit=TRUE,der1=TRUE,der2=FALSE),
+  salmEnd="Jun-15", show=c(fit=TRUE,der1=FALSE,der2=FALSE),
   slcs.per.page=1, plts.hide=FALSE, pdf =FALSE, outfile="ChloroFits")
 {
 	oldpar = if (dev.cur()>1) par(no.readonly = TRUE) else NULL
@@ -33,7 +33,8 @@ calcChloro  = function(dat, wd=getwd(), xfld="period", yfld="Chlo",
 
 	## Get data
 	infile = as.character(substitute(dat))
-	satellite = strsplit(infile,split="\\.")[[1]][1]  ## assumes leading string before first "." is satellite name
+#browser();return()
+	satellite = strsplit(infile,"\\.|_|-|\\||\\+")[[1]][1]  ## assumes leading string before first "." is satellite name
 	if (!is.data.frame(dat)) {
 		if (is.character(dat) && length(dat)==1){
 			expr = paste0("getFile(\"",dat,"\",path=wd,reload=TRUE,tenv=penv()); dat=",dat)
@@ -232,14 +233,17 @@ calcChloro  = function(dat, wd=getwd(), xfld="period", yfld="Chlo",
 		## Assume salmon end date exists
 		salmX1 = strptime(paste0(substring(ss,1,4),"-",salmEnd),"%Y-%b-%d")$yday+1
 		if (zbloo$x[1,1] <= salmX1) { ## e.g., Jun 15 = 166 or 167
-			salmon = sapply(zbloo,function(x){matrix(x[,1],ncol=1)},simplify=FALSE)
+			#salmon = sapply(zbloo,function(x){matrix(x[,1],ncol=1)},simplify=FALSE)
 			salmon = sapply(zbloo,function(x){data.frame(salmon=x[,1])},simplify=FALSE)
 			salmon$x[2,1] = salmX1
+			salmon$x[2,1] = min(salmon$x[2,1],zbloo$x[2,1])
 			salmon$y[2,1] = predFunc(salmX1)
 			salmBloo = sapply(salmon$x,function(x){stats::integrate(predFunc,x[1],x[2])$value})
-			salmDur = salmX1 - zbloo$x[mbloo][1,1]
+			#salmDur = salmX1 - zbloo$x[mbloo][1,1]
+			salmDur = salmon$x[2,1]-salmon$x[1,1]
 			#salmon = sapply(salmon,function(x){dimnames(x)=list(c("start","end"),"salmon");x},simplify=FALSE)
 			#salmBloo = stats::integrate(predFunc,salmon$x[1],salmon$x[2])$value
+#browser();return()
 		} else
 			salmon = NULL
 	
@@ -272,7 +276,9 @@ calcChloro  = function(dat, wd=getwd(), xfld="period", yfld="Chlo",
 		if (show["fit"]) {
 			## Plot original data and smoothed function
 			plot(x,y,xlim=xlim,ylim=ylim,xlab=xfld,ylab=yfld,type="n")
-			#abline(v=167,col="lightgrey")
+			#abline(v=167,lty=2,col="lightgrey")
+			#points(salmX1,par()$usr[3]-diff(par()$usr[3:4])*0.02,pch=24,bg="salmon",cex=1,xpd=NA)
+
 			if (nbloo>0) {
 				for (i in 1:nbloo){ 
 					xpoly = seq(zbloo$x[1,i],zbloo$x[2,i],xint)
@@ -309,6 +315,7 @@ calcChloro  = function(dat, wd=getwd(), xfld="period", yfld="Chlo",
 				legend=legtxt,bty="n",adj=c(0,ifelse(rc[2]>1,0.75,0.75)),yjust=0,cex=ifelse(pdf,0.8,1))
 			mtext(titext,side=3,line=0.25,cex=1.2,col="blue")
 			box()
+			polygon(x=as.vector(apply(salmon$x,1,rep,2)), y=par()$usr[3] + diff(par()$usr[3:4])*0.0075*c(-1,1,1,-1), col="salmon",border="gainsboro", xpd=NA)
 		}
 		if (show["der1"]) {
 			##plot first derivative of smoothed function
@@ -393,7 +400,7 @@ calcChloro  = function(dat, wd=getwd(), xfld="period", yfld="Chlo",
 		writeLines(outlines,con=cmd)
 		system2(cmd) # really slow when no.slices > 50
 	}
-	return(res.slice)
+	return(invisible(res.slice))
 }
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~calcChloro
 
@@ -551,11 +558,11 @@ diffGeo <- function(dat, offset.from.zero=0.1,
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~diffGeo
 
 
-#findDpoly------------------------------2016-05-09
+#findDpoly------------------------------2016-05-11
 #  Find satellite chorophyll events (gridded) in
 #  a polygon bounded seaward by a depth contour.
 #-----------------------------------------------RH
-findDpoly = function(edata, pdata, zfld="Chl", 
+findDpoly = function(edata, pdata, zfld="Chl", novalue=-99, tooBig=30,
    latBands, seePlot=TRUE, xlim, ylim, onam="filtered")
 {
 	on.exit(gc(verbose=FALSE))
@@ -568,6 +575,8 @@ findDpoly = function(edata, pdata, zfld="Chl",
 	}
 	### Locate data in isobath polygon
 	events = as.EventData(data.frame(EID=1:nrow(edata),edata),projection="LL")
+	events[,zfld][is.element(events[,zfld],novalue)] = NA
+	events[,zfld][events[,zfld]>tooBig & !is.na(events[,zfld])] = NA
 	locset = findPolys(events, pdata, maxRows = 1e+06)
 	if (length(locset)==0) stop("No events occur in the target polygon")
 	EinP   = events[is.element(events$EID,sort(unique(locset$EID))),]
@@ -578,6 +587,7 @@ findDpoly = function(edata, pdata, zfld="Chl",
 
 	### Isolate the data into exact polygonal areas
 	egood  = EinP[is.element(EinP$id,names(goodchl)[goodchl]),]
+#browser();return()
 
 	if (!missing(latBands) && !is.null(latBands)){
 		bgood = list()
@@ -606,6 +616,7 @@ findDpoly = function(edata, pdata, zfld="Chl",
 		if (exists("bgood",envir=penv())) {
 			bcol = c("blue","gold","purple","orange")
 			bcol = rep(bcol,length(bgood))[1:length(bgood)]
+#browser();return()
 			for (i in 1:length(bgood))
 				addPoints(bgood[[i]], pch=20, col=bcol[i])
 		}
@@ -621,5 +632,128 @@ findDpoly = function(edata, pdata, zfld="Chl",
 	return(invisible(ogood))
 }
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~findDpoly
+
+
+#sliceDpoly-----------------------------2016-05-11
+#  Slice events located in depth polygons by 
+#  year or (X,Y) to summarise Z by julian day.
+#-----------------------------------------------RH
+sliceDpoly = function(edata, zfld="Chl", slice="year", novalue=-99,
+   tooBig=30, seePlot=TRUE, onam="annual", delim="_")
+{
+	on.exit(gc(verbose=FALSE))
+
+	if (!is.list(edata) || is.data.frame(edata))
+		stop("User must pass a list of data.frames through the argument `edata' (see function `findDpoly')")
+	anames = names(edata) ## area names
+
+	## Summarize the data by area and year (if annual slices) or by julian day slices
+	orchard=list()        ## to collect data for `calcChloro'
+	crumble = list()      ## save summary tables
+	zmax = 0
+	for (i in anames) {
+		idat = edata[[i]]
+		idat[,zfld][is.element(idat[,zfld],novalue)] = NA
+		idat[,zfld][idat[,zfld]>tooBig & !is.na(idat[,zfld])] = NA
+		idat = idat[order(idat$date),]  ## ensure the dates are ascending
+		idat$year = as.numeric(substring(idat$date,1,4))
+		yrs  = .su(idat$year)
+		idat$slice = apply(idat,1,function(x,y){paste0(x[y],collapse=delim)},y=is.element(names(idat),slice))
+		#per  = as.numeric(names(rev(sort(table(diff(as.Date(.su(idat$date))))))[1]))       ## most common period between time slices
+		#MD0  = names(table(sapply(split(idat$date,idat$year),function(x){substring(x[1],6)})))[1] ## most common starting Month-Day
+		moday = .su(unlist(sapply(sapply(split(idat$date,idat$year),function(x){substring(x,6)}),.su)))
+		duniq = sort(unique(moday))
+		zdiff = diff(strptime(duniq,"%m-%d")$yday+1)
+		zdiff = zdiff = c(zdiff[1],zdiff)
+		zgood = .su(zdiff[zdiff>=(max(zdiff)-1)])
+		zbad  = .su(zdiff[zdiff<(max(zdiff)-1)])
+		dgood = duniq[zdiff %in% zgood]; names(dgood) = dgood
+		if (length(zbad) > 0) {
+		dbad  = c(duniq[1],duniq)[zdiff %in% zbad]; names(dbad)  = duniq[zdiff %in% zbad] ## index off days with on days
+		} else dbad=NULL
+		duse  = c(dgood, dbad)
+		goday = duse[substring(idat$date,6)]
+		##-----------------------------------------
+		idat$julian = strptime(goday,"%m-%d")$yday+1
+		uI = sort(unique(idat$slice));  nI = length(uI)
+		uJ = sort(unique(idat$julian)); nJ = length(uJ)
+		uX = sort(unique(idat$X));      nX = length(uX)
+		uY = sort(unique(idat$Y));      nY = length(uY)
+		isumm  = array(NA,dim=c(nJ,nI),dimnames=list(julian=uJ,slice=uI))
+		icells = split(idat,idat$slice)
+		lenv = sys.frame(sys.nframe())
+		fornow = sapply(icells, function(jdat){
+			zlist = split(jdat[,zfld],jdat$julian)
+			zmean = sapply(zlist,function(x){if (all(is.na(x))) NA else mean(x,na.rm=TRUE)})
+			ii = as.character(sort(unique(jdat$slice)))
+			jj = names(zmean)
+			zenv = sys.frame(sys.nframe())
+			tget(isumm,penv=lenv,tenv=zenv)
+			isumm[jj,ii] = zmean
+			tput(isumm,penv=zenv,tenv=lenv)
+		})
+		zmean = apply(isumm,1,mean,na.rm=TRUE)
+		zmean[is.nan(zmean)] = NA
+		zmax  = max(c(zmax,zmean),na.rm=TRUE)
+#browser();return()
+		attr(isumm,paste0(zfld,".mean")) = zmean
+		crumble[[i]] = isumm
+
+		## Calculate (X,Y) locations weighted by julian-day cholorophyll -- only makes a difference if slice = c("X","Y")
+		ctab = convCT(crossTab(idat,c("julian","slice"),"Chl",mean,na.rm=TRUE))
+		XYwtd = list()
+		for (xy in c("X","Y")){
+			xtab = convCT(crossTab(idat,c("julian","slice"),xy,mean,na.rm=T))
+			wtab = t(apply(ctab,1,function(x){z=!is.na(x) & !is.nan(x); x[z] = x[z]/sum(x[z]); x[!z]=0; x}))
+			wtab[is.element(wtab,0)] = NA
+			jtab = apply(wtab*xtab,1,sum,na.rm=T)
+			jtab[is.element(jtab,0)] = eval(parse(text=paste0("mean(u",xy,")")))
+			XYwtd[[xy]] = jtab
+		}
+		## Rearrange data in format for `calcChloro'
+		apple = apply(isumm,2,function(x){
+			nday=length(x)
+			slices = data.frame(X=XYwtd$X, Y=XYwtd$Y, julian=as.numeric(names(x)), zfld=x, region=rep(i,nday))
+			names(slices) = gsub("zfld",zfld,names(slices))
+			return(slices)
+		})
+		bushel = sapply(names(apple), function(x,a){
+			bag = a[[x]]; nday=nrow(bag)
+			bag = data.frame(slice=rep(x,nday),bag)
+			return (bag)
+		}, a=apple, simplify=FALSE) # TRUE craps out for some reason
+
+		for(b in bushel)
+			orchard = rbind(orchard,b)
+		rownames(orchard) = 1:nrow(orchard)
+	}
+	names(orchard) = sub("slice",paste0(slice,collapse=delim),names(orchard))
+
+	### Plot the data positions
+	if (seePlot) {
+		xlim = c(0,365)
+		ylim = c(0,zmax)
+		expandGraph(mfrow=c(1,1))
+		plot(0,0,xlim=xlim,ylim=ylim,type="n",xlab="Julian Day",ylab="Chl a",xaxt="n")
+		for (i in 1:length(crumble)) {
+			ii = names(crumble)[i]
+			iii = crumble[[i]]
+			y  = attributes(iii)[[paste0(zfld,".mean")]];  x = as.numeric(names(y))
+			lines(x,y,col=switch(i,"red","blue","green4"),lwd=2)
+			points(x,y, pch=21, cex=1.2, col=switch(i,"red","blue","green4"), bg=switch(i,"pink","cyan","green"))
+		}
+		axis(1, at=x)
+		legend("topright",lty=1,lwd=2,col=c("red","blue"),legend=anames,bty="n",inset=0.05)
+	}
+	### Save the data
+	anam = paste0(onam,delim,"summary")
+	omess = paste0(onam, "=orchard; ",
+		"save(\"",onam,"\",file=\"",onam,".rda\"); ")
+	omess = paste0(omess, anam,"=crumble; ",
+		"save(\"",anam,"\",file=\"",anam,".rda\"); ")
+	eval(parse(text=omess))
+	return(invisible(orchard))
+}
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~sliceDpolys
 
 

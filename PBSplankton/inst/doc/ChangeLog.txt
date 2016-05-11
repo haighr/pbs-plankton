@@ -6,6 +6,12 @@ Authors: RH  = Rowan Haigh
          TD  = Trevor Davies
 ------------------------------
 
+0.4.0 (2016-05-11)
+  • Added an example to the `calcChloro' help file `calcChloro.Rd'. (RH 1605111)
+  • Modified function `calcChloro' to fix a small bug in calculating duration that salmon experience the spring bloom. (RH 160511)
+  • Modified functions `findDpoly' and `sliceDpoly' to set chlorophyll values of -99 and those >30 to NA. (RH 160511)
+  • Added function `sliceDpoly' to slice events located in depth polygons by year or (X,Y) to summarise Z by julian day. (RH 160510)
+
 0.3.0 (2016-05-09)
   • Added function `findDpoly' to find satellite chorophyll events (gridded) in a polygon bounded seaward by a depth contour. (RH 160509)
   • Added function `createDpoly' to create a depth polygon from a single isobath. (RH 160506)

@@ -9,8 +9,8 @@
   seaward by a depth contour.
 }
 \usage{
-findDpoly(edata, pdata, zfld="Chl", latBands, 
-   seePlot=TRUE, xlim, ylim, onam="filtered")
+findDpoly(edata, pdata, zfld="Chl", novalue=-99, tooBig=30,
+   latBands, seePlot=TRUE, xlim, ylim, onam="filtered")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -19,6 +19,8 @@ findDpoly(edata, pdata, zfld="Chl", latBands,
   \item{zfld}{Field name in event data that contains chlorophyll readings.}
   \item{latBands}{List object of named latitude limits within \code{pdata},
     should the user wish to identify events within specific latitudinal bands.}
+  \item{novalue}{Value in \code{zfld} that indicates a missing value.}
+  \item{tooBig}{Value in \code{zfld} that is unrealistically large; set to \code{NA}.}
   \item{seePlot}{logical: if \code{TRUE}, plot the results on a map.}
   \item{xlim}{Longitude limits of the map.}
   \item{ylim}{Latitude limits of the map.}
