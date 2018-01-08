@@ -456,7 +456,7 @@ createDpoly = function(isob=1000, corner=c("TR","BR"),
 	if (!isob %in% seq(100,1800,100)) stop("Choose one iobath from 100 to 1800 by incremenst of 100")
 	abox = as.PolySet(data.frame(PID=rep(1,4),POS=1:4,X=xbox,Y=ybox),projection="LL")
 	amid = calcCentroid(abox)
-	data(isobath)
+	data(isobath, package="PBSdata", envir=penv())
 	isoLine = isoPoly = isobath[is.element(isobath$PID,isob),]
 	isoPoly$Y[1] = min(ybox)
 	isoPoly$Y[nrow(isoPoly)] = max(ybox)
@@ -473,7 +473,7 @@ createDpoly = function(isob=1000, corner=c("TR","BR"),
 	if (seePlot) {
 		exlim = extendrange(isoPoly$X)
 		eylim = extendrange(isoPoly$Y)
-		data(nepacLLhigh)
+		data(nepacLLhigh, package="PBSmapping", envir=penv())
 		bccoast = clipPolys(nepacLLhigh,xlim=exlim,ylim=eylim)
 		expandGraph()
 		plotMap(bccoast,xlim=exlim,ylim=eylim,col="moccasin",plt=NULL)
@@ -606,7 +606,7 @@ findDpoly = function(edata, pdata, zfld="Chl", novalue=-99, tooBig=30,
 	if (seePlot) {
 		if (missing(xlim)) xlim = extendrange(events$X)
 		if (missing(ylim)) ylim = extendrange(events$Y)
-		data(nepacLLhigh)
+		data(nepacLLhigh, package="PBSmapping", envir=penv())
 		expandGraph(cex=1.5)
 		plotMap(pdata,border="green",col="honeydew",xlim=xlim,ylim=ylim,plt=NULL)
 		abline(h=c(51,52,54))

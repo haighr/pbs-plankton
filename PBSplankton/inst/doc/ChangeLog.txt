@@ -6,26 +6,51 @@ Authors: RH  = Rowan Haigh
          TD  = Trevor Davies
 ------------------------------
 
+0.6.0 (2018-01-08)
+  * Data
+    + Replaced `index.html' with `Links.html' in /inst/doc. (RH 180108)
+    + Replaced 5 non-ascii characters in `phytospp' found by R CMD check. (RH 180108)
+    + Modified calls to `data' to state the package and to load the data only to the environment of the function calling `data'. (RH 180108)
+    + OK, so I wasn't finished -- continued working on `phytospp': (RH 180105)
+      - created a function `make.phytospp' (see R file in inst/doc) for making the `phytospp' data object from MDB;
+      - added PID and SID to `phytospp' for control over sorting;
+      - attached a toxin table and creation date as attributes to `phytospp'.
+    + Finished updating `phytospp' for a while; many bibtex refs are still missing. (RH 180104)
+    + Updated italics file `genus.species.txt' for use by PBStools' function `texArray':
+      - e.g., texArray(phytospp[,c(2,8)], italics.file="genus.species.txt")  ## see mytable+.tex and compile with pdfLatex
+
+0.5.0 (2017-07-19)
+  * Data
+    + Updated data object `phytospp' and added a bibtex file called `Taxonomy.bib'. (RH 170719)
+
 0.4.0 (2016-05-11)
-  • Added an example to the `calcChloro' help file `calcChloro.Rd'. (RH 1605111)
-  • Modified function `calcChloro' to fix a small bug in calculating duration that salmon experience the spring bloom. (RH 160511)
-  • Modified functions `findDpoly' and `sliceDpoly' to set chlorophyll values of -99 and those >30 to NA. (RH 160511)
-  • Added function `sliceDpoly' to slice events located in depth polygons by year or (X,Y) to summarise Z by julian day. (RH 160510)
+  * Documentation
+    + Added an example to the `calcChloro' help file `calcChloro.Rd'. (RH 1605111)
+  * P03_Satellites.r
+    + Modified function `calcChloro' to fix a small bug in calculating duration that salmon experience the spring bloom. (RH 160511)
+    + Modified functions `findDpoly' and `sliceDpoly' to set chlorophyll values of -99 and those >30 to NA. (RH 160511)
+    + Added function `sliceDpoly' to slice events located in depth polygons by year or (X,Y) to summarise Z by julian day. (RH 160510)
 
 0.3.0 (2016-05-09)
-  • Added function `findDpoly' to find satellite chorophyll events (gridded) in a polygon bounded seaward by a depth contour. (RH 160509)
-  • Added function `createDpoly' to create a depth polygon from a single isobath. (RH 160506)
-  • Added function `transData' to transpose tabulated geo-referenced data from a file into a data frame. (RH 160506)
-  • Added function `dfread' to read a data.frame using the `fread' function from the package `data.table'. (RH 160506)
-  • Added function `diffGeo' to transform a geospatial object's coordinates into Cartesian coordinates. (RH/TD 160506)
+  * P03_Satellites.r
+    + Added function `findDpoly' to find satellite chorophyll events (gridded) in a polygon bounded seaward by a depth contour. (RH 160509)
+    + Added function `createDpoly' to create a depth polygon from a single isobath. (RH 160506)
+    + Added function `transData' to transpose tabulated geo-referenced data from a file into a data frame. (RH 160506)
+    + Added function `dfread' to read a data.frame using the `fread' function from the package `data.table'. (RH 160506)
+    + Added function `diffGeo' to transform a geospatial object's coordinates into Cartesian coordinates. (RH/TD 160506)
 
 0.2.0 (2016-04-28)
-  • Added function `calcChloro' to smooth satellite  chlorophyll data and estimate bloom magnitude and duration. (RH 160428)
-  • Added function `calcDeriv' which is used by `calcChloro'. (RH 160426)
-  • Updated the Rnw-based User's Guide. (RH 160426)
-  • Updated data object `phytospp' to have Latex-compatible symbols. (RH 160426)
+  * P03_Satellites.r
+    + Added function `calcChloro' to smooth satellite  chlorophyll data and estimate bloom magnitude and duration. (RH 160428)
+    + Added function `calcDeriv' which is used by `calcChloro'. (RH 160426)
+  * Documentation
+    + Updated the Rnw-based User's Guide. (RH 160426)
+  * Data
+    + Updated data object `phytospp' to have Latex-compatible symbols. (RH 160426)
 
 0.1.0 (2016-04-25)
-  • Started User's Guide for PBSplankton. (RH 160425)
-  • Extracted dataset `phytospp' from `PBSdata'. (RH 160425)
-  • Created new package `PBSplankton' using three functions from `PBStools' -- `boxSeason', `plotDiversity', `trackComp'. (RH 160425)
+  * Documentation
+    + Started User's Guide for PBSplankton. (RH 160425)
+    + Created new package `PBSplankton' using three functions from `PBStools' -- `boxSeason', `plotDiversity', `trackComp'. (RH 160425)
+  * Data
+    + Extracted dataset `phytospp' from `PBSdata'. (RH 160425)

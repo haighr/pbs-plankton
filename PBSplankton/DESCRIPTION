@@ -1,6 +1,6 @@
 Package: PBSplankton
-Version: 0.4.0
-Date:    2016-05-11
+Version: 0.6.0
+Date:    2018-01-08
 Title:   Plankton from Samples to Satellites
 Authors@R: c(
    person("Rowan", "Haigh", role=c("aut","cre"), email="rowan.haigh@dfo-mpo.gc.ca"),
@@ -9,7 +9,7 @@ Authors@R: c(
    person(c("Trevor", "D."), "Davies", role="ctb", email="trevor.davies@gov.bc.ca") )
 Author:     Rowan Haigh [aut, cre], Lyse Godbout [ctb], Wayne Hajas [ctb], Trevor D. Davies [ctb]
 Maintainer: Rowan Haigh <rowan.haigh@dfo-mpo.gc.ca>
-Copyright:  2013-2016, Fisheries and Oceans Canada
+Copyright:  2013-2018, Fisheries and Oceans Canada
 Depends:    R (>= 3.0.0), PBStools
 Imports:    numDeriv, data.table
 Description: Provides tools for exploring and processing plankton
