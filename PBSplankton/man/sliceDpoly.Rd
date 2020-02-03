@@ -9,19 +9,20 @@
 }
 \usage{
 sliceDpoly(edata, zfld="Chl", slice="year", novalue=-99,
-   tooBig=30, seePlot=TRUE, onam="annual", delim="_")
+   tooBig=30, seePlot=TRUE, onam="annual", delim="_", hadley=FALSE)
 }
 \arguments{
-  \item{edata}{List object of regional event data (located in polygons
+  \item{edata}{\code{list} - list of regional \code{EventData} objects (located in polygons
     by \code{findDpoly}) -- usually gridded satellite cholorophyll readings.}
-  \item{zfld}{Field name in event data that contains chlorophyll readings.}
-  \item{slice}{Field(s) in \code{edata} used to aggregate \code{zfld} 
+  \item{zfld}{\code{character} -- field name in event data that contains chlorophyll readings.}
+  \item{slice}{\code{character} -- field(s) in \code{edata} used to aggregate \code{zfld} 
     (e.g., chlorophyll) when calculating a mean for each julian day.}
-  \item{novalue}{Value in \code{zfld} that indicates a missing value.}
-  \item{tooBig}{Value in \code{zfld} that is unrealistically large; set to \code{NA}.}
-  \item{seePlot}{logical: if \code{TRUE}, plot the results on a map.}
-  \item{onam}{Output name (without extension) of a binary results file (\code{*.rda}).}
-  \item{delim}{Delimiter for file names and for concatenating field names when generating slices.}
+  \item{novalue}{\code{numeric} -- value in \code{zfld} that indicates a missing value.}
+  \item{tooBig}{\code{numeric} -- value in \code{zfld} that is unrealistically large; set to \code{NA}.}
+  \item{seePlot}{\code{logical} -- if \code{TRUE}, plot the results on a map.}
+  \item{onam}{\code{character} -- output name (without extension) for the binary results file (\code{*.rda}).}
+  \item{delim}{\code{character} -- delimiter for file names and for concatenating field names when generating slices.}
+  \item{hadley}{\code{logical} -- if \code{TRUE}, use \code{reshape}'s functions in \code{crossTab}.}
 }
 \details{
   Slices are often described as geo-referenced Z values (e.g., 
@@ -49,8 +50,10 @@ sliceDpoly(edata, zfld="Chl", slice="year", novalue=-99,
   day and the user-specified \code{slice} and named \code{<onam>.summary.rda}.
 }
 \author{
-  Rowan Haigh, Research Biologist, \cr
-  Fisheries and Oceans Canada, Pacific Biological Station, Nanaimo BC
+  \href{mailto:rowan.haigh@dfo-mpo.gc.ca}{Rowan Haigh}, Program Head -- Offshore Rockfish\cr
+  Pacific Biological Station (PBS), Fisheries & Oceans Canada (DFO), Nanaimo BC\cr
+  \emph{locus: Institute of Ocean Sciences (IOS), Sidney BC}\cr
+  Last modified \code{Rd: 2018-06-07}\cr
 }
 \note{
   If the slice contains some spatial element (\code{X} or \code{Y})

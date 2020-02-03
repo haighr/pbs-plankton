@@ -6,6 +6,12 @@ Authors: RH  = Rowan Haigh
          TD  = Trevor Davies
 ------------------------------
 
+0.7.0 (2018-06-07)
+  * P03_Satellites.r
+    + Updated function `sliceDpoly' to use the revised version of `crossTab' in PBStools or the old version that uses hadley's `reshape' package. (RH 180607)
+  * Documentation
+    + Added a new package Rd file to explain the steps to integrate chlorophyll values from satellite data. (RH 180607)
+
 0.6.0 (2018-01-08)
   * Data
     + Replaced `index.html' with `Links.html' in /inst/doc. (RH 180108)

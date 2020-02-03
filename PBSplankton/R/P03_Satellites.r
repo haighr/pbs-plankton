@@ -456,7 +456,7 @@ createDpoly = function(isob=1000, corner=c("TR","BR"),
 	if (!isob %in% seq(100,1800,100)) stop("Choose one iobath from 100 to 1800 by incremenst of 100")
 	abox = as.PolySet(data.frame(PID=rep(1,4),POS=1:4,X=xbox,Y=ybox),projection="LL")
 	amid = calcCentroid(abox)
-	data(isobath, package="PBSdata", envir=penv())
+	data(isobath)
 	isoLine = isoPoly = isobath[is.element(isobath$PID,isob),]
 	isoPoly$Y[1] = min(ybox)
 	isoPoly$Y[nrow(isoPoly)] = max(ybox)
@@ -473,7 +473,7 @@ createDpoly = function(isob=1000, corner=c("TR","BR"),
 	if (seePlot) {
 		exlim = extendrange(isoPoly$X)
 		eylim = extendrange(isoPoly$Y)
-		data(nepacLLhigh, package="PBSmapping", envir=penv())
+		data(nepacLLhigh)
 		bccoast = clipPolys(nepacLLhigh,xlim=exlim,ylim=eylim)
 		expandGraph()
 		plotMap(bccoast,xlim=exlim,ylim=eylim,col="moccasin",plt=NULL)
@@ -606,7 +606,7 @@ findDpoly = function(edata, pdata, zfld="Chl", novalue=-99, tooBig=30,
 	if (seePlot) {
 		if (missing(xlim)) xlim = extendrange(events$X)
 		if (missing(ylim)) ylim = extendrange(events$Y)
-		data(nepacLLhigh, package="PBSmapping", envir=penv())
+		data(nepacLLhigh)
 		expandGraph(cex=1.5)
 		plotMap(pdata,border="green",col="honeydew",xlim=xlim,ylim=ylim,plt=NULL)
 		abline(h=c(51,52,54))
@@ -634,12 +634,12 @@ findDpoly = function(edata, pdata, zfld="Chl", novalue=-99, tooBig=30,
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~findDpoly
 
 
-#sliceDpoly-----------------------------2016-05-11
-#  Slice events located in depth polygons by 
-#  year or (X,Y) to summarise Z by julian day.
-#-----------------------------------------------RH
+## sliceDpoly---------------------------2018-06-07
+##  Slice events located in depth polygons by 
+##  year or (X,Y) to summarise Z by julian day.
+## ---------------------------------------------RH
 sliceDpoly = function(edata, zfld="Chl", slice="year", novalue=-99,
-   tooBig=30, seePlot=TRUE, onam="annual", delim="_")
+   tooBig=30, seePlot=TRUE, onam="annual", delim="_", hadley=FALSE)
 {
 	on.exit(gc(verbose=FALSE))
 
@@ -695,15 +695,21 @@ sliceDpoly = function(edata, zfld="Chl", slice="year", novalue=-99,
 		zmean = apply(isumm,1,mean,na.rm=TRUE)
 		zmean[is.nan(zmean)] = NA
 		zmax  = max(c(zmax,zmean),na.rm=TRUE)
-#browser();return()
 		attr(isumm,paste0(zfld,".mean")) = zmean
 		crumble[[i]] = isumm
 
 		## Calculate (X,Y) locations weighted by julian-day cholorophyll -- only makes a difference if slice = c("X","Y")
-		ctab = convCT(crossTab(idat,c("julian","slice"),"Chl",mean,na.rm=TRUE))
+		if (hadley)
+			ctab = convCT(crossTab(idat,c("julian","slice"),"Chl",mean,na.rm=TRUE))
+		else
+			ctab = crossTab(idat,c("julian","slice"),"Chl",mean,na.rm=TRUE)
+#browser();return()
 		XYwtd = list()
 		for (xy in c("X","Y")){
-			xtab = convCT(crossTab(idat,c("julian","slice"),xy,mean,na.rm=T))
+			if (hadley)
+				xtab = convCT(crossTab(idat,c("julian","slice"),xy,mean,na.rm=T))
+			else
+				xtab = crossTab(idat,c("julian","slice"),xy,mean,na.rm=T)
 			wtab = t(apply(ctab,1,function(x){z=!is.na(x) & !is.nan(x); x[z] = x[z]/sum(x[z]); x[!z]=0; x}))
 			wtab[is.element(wtab,0)] = NA
 			jtab = apply(wtab*xtab,1,sum,na.rm=T)
@@ -754,6 +760,6 @@ sliceDpoly = function(edata, zfld="Chl", slice="year", novalue=-99,
 	eval(parse(text=omess))
 	return(invisible(orchard))
 }
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~sliceDpolys
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~sliceDpoly
 
 
