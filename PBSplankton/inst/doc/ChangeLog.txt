@@ -6,6 +6,14 @@ Authors: RH  = Rowan Haigh
          TD  = Trevor Davies
 ------------------------------
 
+0.8.0 (2020-02-03)  [Rcheck=F, Rbuild=F]
+  * Data
+    + Updated data object `phytospp' (RH 200131)
+      - pid = Genus name (instead of six-letter code);
+      - sid = 1-99: species, 101-199: unknown species or size categories, 201-299: spores or auxospores;
+      - finished authorities.
+    + Updated bib file `Taxonomy.bib' (RH 200131)
+
 0.7.0 (2018-06-07)
   * P03_Satellites.r
     + Updated function `sliceDpoly' to use the revised version of `crossTab' in PBStools or the old version that uses hadley's `reshape' package. (RH 180607)

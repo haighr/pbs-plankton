@@ -1,11 +1,11 @@
-make.phytospp = function()
+make.phytospp = function(path="../../Refs")
 {
-	getData("phytospp", "PBSplankton", type="MDB")
+	getData("phytospp", "PBSplankton", type="MDB", path=path)
 	phytospp = PBSdat
 	colnames(phytospp) = tolower(colnames(phytospp))
 	phytospp = phytospp[order(phytospp$pid,phytospp$sid),]
 
-	getData("C_Toxins", "PBSplankton", type="MDB")
+	getData("C_Toxins", "PBSplankton", type="MDB", path=path)
 	toxins = PBSdat
 	colnames(toxins) = tolower(colnames(toxins))
 	toxins = toxins[order(toxins$acronym),]
@@ -22,8 +22,9 @@ make.phytospp = function()
 		old.date  = gsub("-","",substring(old.stamp,3,10))
 		file.copy(from="phytospp.rda", to=paste0("phytospp-",old.date,".rda"), overwrite=TRUE, copy.date=TRUE)
 	}
-	save("phytospp", file="phytospp.rda")
 #browser();return()
+	assign("phytospp", phytospp, envir=.GlobalEnv)
+	save("phytospp", file="phytospp.rda")
 }
 
 make.phytospp()
